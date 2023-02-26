@@ -1,9 +1,3 @@
-> 项目中代码已经添加注释
-
-## 目录
-
-[toc]
-
 ## vue文件到DOM元素经历的过程
 
 在Vue 3中，`.vue`文件最终会被编译成一个`render`函数，用于生成组件的虚拟节点（`vnode`），然后通过Vue 3内置的`createApp`函数创建一个Vue实例，将`vnode`挂载到该实例的根节点上，最终生成真实的DOM节点。
@@ -15,6 +9,8 @@
 3. 创建组件实例：通过Vue 3内置的`createComponentInstance`函数，创建组件的实例对象。该函数会根据组件的选项对象创建一个组件实例，并将组件实例的配置信息（如`props`、`methods`、`data`等）与编译生成的`render`函数进行关联。
 4. 执行渲染函数：通过Vue 3内置的`setupRenderEffect`函数，执行编译生成的`render`函数，并将生成的`vnode`节点与组件实例对象的`_vnode`属性进行绑定。这个过程中，Vue 3会自动对组件中使用的响应式数据进行依赖追踪，从而在数据发生变化时能够触发`render`函数的重新执行。
 5. 挂载DOM节点：通过Vue 3内置的`createApp`函数，创建Vue实例，并将生成的`vnode`节点挂载到该实例的根节点上。在这个过程中，Vue 3会将`vnode`节点转换成真实的DOM节点，并将其添加到DOM树中。
+
+
 
 ## Vnode和ComponentInstance对象
 
