@@ -16,6 +16,53 @@
 4. 执行渲染函数：通过Vue 3内置的`setupRenderEffect`函数，执行编译生成的`render`函数，并将生成的`vnode`节点与组件实例对象的`_vnode`属性进行绑定。这个过程中，Vue 3会自动对组件中使用的响应式数据进行依赖追踪，从而在数据发生变化时能够触发`render`函数的重新执行。
 5. 挂载DOM节点：通过Vue 3内置的`createApp`函数，创建Vue实例，并将生成的`vnode`节点挂载到该实例的根节点上。在这个过程中，Vue 3会将`vnode`节点转换成真实的DOM节点，并将其添加到DOM树中。
 
+## Compile
+
+在 Vue 3 中，`compile-core`、`compile-dom`、`compile-sfc` 和 `compile-ssr` 都是 Vue 内置的编译器模块，它们之间的关系如下：
+
+1. `compile-core` 是 Vue 编译器的核心模块，它定义了编译器的基本逻辑和 API，包括模板解析、 AST 转换、代码生成等功能。`compile-core` 模块不依赖于特定的平台（如浏览器、服务器等），因此可以用于多种环境下的编译任务。
+2. `compile-dom` 是针对浏览器环境的编译器模块，它基于 `compile-core` 模块扩展了一些浏览器特有的编译逻辑，比如元素属性的处理、事件处理等。`compile-dom` 模块将编译结果生成为浏览器可以直接渲染的 DOM 树。
+3. `compile-ssr` 是针对服务器端渲染（Server-Side Rendering，SSR）的编译器模块，它同样基于 `compile-core` 模块，但会针对服务器端渲染的特点进行一些优化，如静态节点提取、片段缓存等。`compile-ssr` 模块将编译结果生成为字符串形式的 HTML。
+4. `compile-sfc` 是 Vue 单文件组件（Single-File Components，SFC）的编译器模块，它基于 `compile-core` 模块和 `compile-dom` 模块，将单文件组件中的模板、样式和脚本分别编译成渲染函数、CSS 样式和 JS 代码。`compile-sfc` 模块是 Vue CLI 和 Vite 等前端构建工具的核心模块之一。
+
+这些编译器模块之间存在一定的依赖关系，比如 `compile-dom` 和 `compile-ssr` 都依赖于 `compile-core` 模块，而 `compile-sfc` 则同时依赖于 `compile-core` 和 `compile-dom` 两个模块。这些模块之间的协作，使得 Vue 编译器能够适应不同的编译场景，实现了一定程度的复用和解耦。
+
+### 虚拟语法树
+
+所有编译函数的编译结果（返回值）对象中都包含一个`ast`属性。
+
+在 Vue 3 中，虚拟语法树（Abstract Syntax Tree，AST）是 Vue 编译器的一个重要概念，用于描述模板代码的抽象语法结构。Vue 3 的编译器会先将模板代码解析成 AST，然后再将 AST 转换成可执行的渲染函数，最终用于生成真实的 DOM 节点。
+
+Vue 3 的 AST 是一个基于 JSON 格式的对象，用于表示模板代码中的各种语法结构。一个简单的 Vue 3 模板代码的 AST 结构可能如下所示：
+
+```json
+{
+  "type": 1,
+  "tag": "div",
+  "props": [],
+  "children": [
+    {
+      "type": 2,
+      "content": "Hello, {{ name }}!",
+      "expression": {
+        "type": 4,
+        "content": "name"
+      }
+    }
+  ]
+}
+```
+
+其中，`type` 表示节点的类型，1 表示普通元素节点，2 表示文本节点，4 表示简单表达式节点，等等。`tag` 表示元素节点的标签名，`props` 表示元素节点的属性列表，`children` 表示元素节点的子节点列表。对于文本节点和简单表达式节点，它们分别用 `content` 和 `expression` 属性来表示它们的内容和表达式。
+
+Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循环语句、事件绑定等，这些语法结构的对应节点类型和属性也都有所不同。Vue 3 的 AST 通过一系列的转换和优化过程，最终会被转换成可执行的渲染函数。在开发过程中，我们可以使用 Vue 3 提供的编译器 API 来直接操作 AST，实现一些高级的模板功能，比如自定义指令、动态组件等。
+
+### compile-sfc
+
+- 文件：`vuejs.core\packages\compiler-sfc\src\compileTemplate.ts`
+
+- 函数：`compileTemplate` --->`doCompileTemplate` 
+
 ## Vnode和ComponentInstance对象
 
 - `vnode`（Virtual DOM Node）：虚拟节点，是Vue内部用来**描述DOM节点的JavaScript对象**。每个vnode包含节点的标签名、属性、子节点等信息，它们可以通过渲染函数或者组件的render方法生成。在Vue的数据变化检测过程中，Vue会比对新旧vnode之间的差异，并根据差异更新DOM。因为vnode的创建和比对都在JavaScript中进行，所以相对于直接操作DOM，它们更加高效、灵活和安全。

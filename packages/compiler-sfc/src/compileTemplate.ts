@@ -195,6 +195,7 @@ function doCompileTemplate({
   const shortId = id.replace(/^data-v-/, '')
   const longId = `data-v-${shortId}`
 
+  // 调用CompilerSSR 或 CompilerDOM，得到基础编译结果
   let { code, ast, preamble, map } = compiler.compile(source, {
     mode: 'module',
     prefixIdentifiers: true,
