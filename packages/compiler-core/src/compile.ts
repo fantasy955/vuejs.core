@@ -94,9 +94,6 @@ export function baseCompile(
     }
   }
 
-  // 遍历 AST 节点树，对上面生成的 AST 进行指令转换，生成可用节点，同时根据 compiler
-  // 传入的配置（如是否做静态节点提升等）对 AST 节点树进行优化处理，为 rootNode 及
-  // 下属每个节点挂载 codegenNode
   transform(
     ast,
     // Object.assign
