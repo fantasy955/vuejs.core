@@ -1143,7 +1143,7 @@ function baseCreateRenderer(
   }
 
   const processComponent = (
-    n1: VNode | null, // 之前的vnode，是否是第一次挂载
+    n1: VNode | null,
     n2: VNode,
     container: RendererElement,
     anchor: RendererNode | null,
@@ -1155,9 +1155,7 @@ function baseCreateRenderer(
   ) => {
     n2.slotScopeIds = slotScopeIds
     if (n1 == null) {
-      // 第一次
       if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) {
-        // keepalive
         ;(parentComponent!.ctx as KeepAliveContext).activate(
           n2,
           container,
@@ -1177,7 +1175,6 @@ function baseCreateRenderer(
         )
       }
     } else {
-      // 更新组件
       updateComponent(n1, n2, optimized)
     }
   }
@@ -1193,9 +1190,6 @@ function baseCreateRenderer(
   ) => {
     // 2.x compat may pre-create the component instance before actually
     // mounting
-    // 是否创建 兼容性组件
-    // 这段代码的作用是检查当前代码是否运行在兼容模式下，并且判断initialVNode是否是兼容模式下的根节点。
-    // 如果是，就将initialVNode.component赋值给compatMountInstance变量。
     const compatMountInstance =
       __COMPAT__ && initialVNode.isCompatRoot && initialVNode.component
     const instance: ComponentInternalInstance =
@@ -1245,9 +1239,6 @@ function baseCreateRenderer(
       return
     }
 
-    /**
-     * 创建或更新组件的渲染函数，并将它绑定到组件的实例对象上，从而实现响应式渲染。
-     */
     setupRenderEffect(
       instance,
       initialVNode,
