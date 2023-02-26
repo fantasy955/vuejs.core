@@ -70,8 +70,6 @@ import {
 // import, which should be used instead of a resolveDirective call.
 const directiveImportMap = new WeakMap<DirectiveNode, symbol>()
 
-// 返回的是一个函数 postTransformElement
-// postTransformElement函数回生成VNode
 // generate a JavaScript AST for this element's codegen
 export const transformElement: NodeTransform = (node, context) => {
   // perform the work on exit, after all child expressions have been
@@ -151,7 +149,7 @@ export const transformElement: NodeTransform = (node, context) => {
       if (vnodeTag === KEEP_ALIVE) {
         // Although a built-in component, we compile KeepAlive with raw children
         // instead of slot functions so that it can be used inside Transition
-        // or other Transition-wrapping HOCs.  HOC: 高阶组件
+        // or other Transition-wrapping HOCs.
         // To ensure correct updates with block optimizations, we need to:
         // 1. Force keep-alive into a block. This avoids its children being
         //    collected by a parent block.
@@ -230,8 +228,6 @@ export const transformElement: NodeTransform = (node, context) => {
       }
     }
 
-    // 将模板转换为VNode
-    // VNode类型为 NodeTypes.VNODE_CALL
     node.codegenNode = createVNodeCall(
       context,
       vnodeTag,
