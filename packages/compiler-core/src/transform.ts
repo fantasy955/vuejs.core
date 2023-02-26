@@ -413,7 +413,9 @@ export function traverseNode(
   // apply transform plugins
   const { nodeTransforms } = context
   const exitFns = []
+  // 执行所有transform函数
   for (let i = 0; i < nodeTransforms.length; i++) {
+    // onExit是一个函数
     const onExit = nodeTransforms[i](node, context)
     if (onExit) {
       if (isArray(onExit)) {
@@ -460,6 +462,7 @@ export function traverseNode(
       break
   }
 
+  // 执行transform
   // exit transforms
   context.currentNode = node
   let i = exitFns.length

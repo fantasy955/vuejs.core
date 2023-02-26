@@ -56,6 +56,7 @@ export function getBaseTransformPreset(
   ]
 }
 
+// 生成AST，调用transform
 // we name it `baseCompile` so that higher order compilers like
 // @vue/compiler-dom can export `compile` while re-exporting everything else.
 export function baseCompile(
@@ -95,6 +96,7 @@ export function baseCompile(
 
   transform(
     ast,
+    // Object.assign
     extend({}, options, {
       prefixIdentifiers,
       nodeTransforms: [
