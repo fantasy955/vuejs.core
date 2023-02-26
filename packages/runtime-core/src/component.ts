@@ -460,6 +460,7 @@ const emptyAppContext = createAppContext()
 
 let uid = 0
 
+<<<<<<< HEAD
 /**
  *
  * 在Vue中，每个组件都是通过构造函数VueComponent创建的实例，
@@ -475,18 +476,18 @@ let uid = 0
  * @param suspense
  * @returns
  */
+=======
+>>>>>>> e884f02a... Revert "chore: 分析createComponentInstance函数"
 export function createComponentInstance(
   vnode: VNode, // 虚拟节点，对组件的描述
   parent: ComponentInternalInstance | null,
   suspense: SuspenseBoundary | null
 ) {
   const type = vnode.type as ConcreteComponent
-  // 组件上下文 继承父组件上下文 -> 自身上下文 -> 空上下文
   // inherit parent app context - or - if root, adopt from root vnode
   const appContext =
     (parent ? parent.appContext : vnode.appContext) || emptyAppContext
 
-  // 组件实例的属性和方法，包括vnode
   const instance: ComponentInternalInstance = {
     uid: uid++,
     vnode,
@@ -563,8 +564,6 @@ export function createComponentInstance(
     ec: null,
     sp: null
   }
-
-  // 设置组件上下文
   if (__DEV__) {
     instance.ctx = createDevRenderContext(instance)
   } else {
