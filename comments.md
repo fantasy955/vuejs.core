@@ -84,7 +84,7 @@ Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循
 
 总的来说，将 AST 转换为 `vnode` 的过程需要用到 `createVNodeTransform`、`transform` 和 `transformElement`、`transformSlotOutlet` 等函数，并通过遍历 AST 树，将 AST 节点转换为 `vnodeCall` 对象。
 
-### transform中的onExit()函数和VNodeCall
+### transform中的onExit()函数
 
 `transformXXX`函数用来转换一些vue语法，例如`v-if`, `v-for`，经`transformsXXX`函数处理过的AST节点会被挂载`codeGenNode`属性（其实就是调用vnode创建的interface），该属性包含patchFlag等在AST解析阶段无法获得的信息，**其作用就是为了在后面的generate阶段生成vnode的创建调用**。
 
