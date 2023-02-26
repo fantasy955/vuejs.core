@@ -78,11 +78,46 @@ Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循
 1. 通过 `createVNodeTransform`函数生成 AST 转换器，包括 `transformElement`、`transformSlotOutlet` 等方法，用于将 AST 节点转换成 `vnode` 对象。
 2. 调用 `transform` 函数，将 AST 树和生成的转换器作为参数传入，开始执行 AST 转换。
 3. `transform` 函数遍历 AST 树中的每一个节点，并根据节点类型选择相应的转换器进行转换。
-4. `transformElement` 方法会将 AST 树中的普通元素节点转换成 `vnode` 对象，包括节点类型、节点属性、子节点等信息。对于子节点，会递归调用 `transform` 方法进行转换。
+4. `transformElement` 方法会将 AST 树中的普通元素节点转换成 `vnodeCall` 对象，包括节点类型、节点属性、子节点等信息。对于子节点，会递归调用 `transform` 方法进行转换。
 5. `transformSlotOutlet` 方法用于转换插槽节点，将其转换为带有 `name` 和 `children` 属性的 `vnode` 对象。
 6. 最终，`transform` 函数返回转换后的 `vnode` 对象。
 
-总的来说，将 AST 转换为 `vnode` 的过程需要用到 `createVNodeTransform`、`transform` 和 `transformElement`、`transformSlotOutlet` 等函数，并通过遍历 AST 树，将 AST 节点转换为 `vnode` 对象。
+总的来说，将 AST 转换为 `vnode` 的过程需要用到 `createVNodeTransform`、`transform` 和 `transformElement`、`transformSlotOutlet` 等函数，并通过遍历 AST 树，将 AST 节点转换为 `vnodeCall` 对象。
+
+### transform中的onExit()函数
+
+`transformXXX`函数用来转换一些vue语法，例如`v-if`, `v-for`，经`transformsXXX`函数处理过的AST节点会被挂载`codeGenNode`属性（其实就是调用vnode创建的interface），该属性包含patchFlag等在AST解析阶段无法获得的信息，**其作用就是为了在后面的generate阶段生成vnode的创建调用**。
+
+`transformElement`和`transformText`转换后都返回了一个`onExit`回调函数，在这个函数内部挂载`codeGenNode`属性——当所有转换函数执行完毕后再执行`onExit`函数。为什么？
+
+所有转换函数都会判断node的类型再执行，一个node只会被一个转换函数处理（转换函数是给AST节点挂载`codeGenNode`属性，重复执行也会被覆盖）。
+
+这里需要介绍这两个转换函数的作用，`transformElement`函数处理节点类型为：
+
+```ts
+ node.type === NodeTypes.ELEMENT &&
+        (node.tagType === ElementTypes.ELEMENT ||
+          node.tagType === ElementTypes.COMPONENT)
+```
+
+它最终返回节点的`VNodeCall`接口（`VNodeCall`接口，它定义了虚拟节点的属性和方法）。
+
+`VNodeCall`类型和`VNode`类型的区别是：
+
+- `VNodeCall`类型是一个接口，它定义了虚拟节点的属性和方法，但它不是一个实例化的对象
+- `VNode`类型是一个类，它实现了`VNodeCall`接口，并且有一些额外的字段，如el（真实DOM元素），shapeFlag（虚拟节点的形状），key（虚拟节点的唯一标识），等等
+- `VNodeCall`类型是用来**创建虚拟节点的参数**，而`VNode`类型是用来表示虚拟节点的对象
+- `VNodeCall`类型可以通过h函数或JSX语法转换成`VNode`类型
+
+> `VNodeCall`只有属性而没有方法。
+>
+> `VNodeCall`的类型定义：`vuejs.core\packages\compiler-core\src\ast.ts`
+>
+> `VNode`的类型定义：`vuejs.core\packages\runtime-core\src\vnode.ts`
+>
+> 每个节点都有一个对应的VNodeCall，用来创建VNode。
+
+因此`transformElement`返回一个用来创建`VNode`的接口，**它必须保证它的子节点被转换完毕后再执行**，因此在`onExit`阶段才执行转换操作。
 
 ## Vnode和ComponentInstance对象
 
@@ -111,3 +146,7 @@ Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循
 在渲染过程中，如果某些响应式数据发生了变化，就会触发副作用函数的重新执行，重新生成新的渲染节点，并将其与之前的渲染节点进行比较，最终将差异应用到DOM上，从而实现响应式更新。
 
 在Vue 3中，`setupRenderEffect`函数被广泛应用于组件的初始化、更新、卸载等过程中，它是实现Vue 3响应式机制的核心之一。由于Vue 3的响应式系统采用了Proxy代理对象的实现方式，相比Vue 2的响应式系统，它具有更高的性能和更灵活的特性，可以更好地支持动态组件、异步更新等场景。
+
+## 参考资料
+
+- [Vue3源码解读（5）-transform与generate - 掘金 (juejin.cn)](https://juejin.cn/post/7060003448783110151)

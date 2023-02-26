@@ -314,8 +314,21 @@ export function createTransformContext(
   return context
 }
 
+// transform 函数对静态提升其决定性作用的两件事：
+// 1. 将原始 AST 中的静态节点对应的 AST Element 赋值给根 AST 的 hoists 属性。
+// 2. 获取原始 AST 需要的 helpers 对应的键名，用于 generate 阶段的生成可执行代码的获取对应函数，
+//    例如 createTextVNode、createStaticVNode、renderList 等等。
+
+// `<div>hi vue3</div>` 会命中 transformElement 和 transformText 两个 plugin 的逻辑。
+
+// 引用自
+// 作者：快应用
+// 链接：https://juejin.cn/post/7060003448783110151
 export function transform(root: RootNode, options: TransformOptions) {
   const context = createTransformContext(root, options)
+  // traverseNode 函数中会对 AST Element 应用具体的 transform 函数，大致可以分为两类：
+  // 1. 静态节点 transform 应用，即节点不含有插值、指令、props、动态样式的绑定等。
+  // 2. 动态节点 transform 应用，即节点含有插值、指令、props、动态样式的绑定等。
   traverseNode(root, context)
   if (options.hoistStatic) {
     hoistStatic(root, context)
@@ -405,6 +418,12 @@ export function traverseChildren(
   }
 }
 
+// 遍历AST节点树过程中，通过node转换器（nodeTransforms）对当前节点进行node转换，
+// 子节点全部遍历完成后执行对应指令的onExit回调退出转换。对v-if、v-for等指令的转换生成对应节点，
+// 都是由nodeTransforms中对应的指令转换工具完成的。
+// 经nodeTransforms处理过的AST节点会被挂载codeGenNode属性（其实就是调用vnode创建的interface），
+// 该属性包含patchFlag等在AST解析阶段无法获得的信息，其作用就是为了在后面的generate阶段生成vnode的创建调用。
+// 本质上codegenNode是一个表达式对象。
 export function traverseNode(
   node: RootNode | TemplateChildNode,
   context: TransformContext

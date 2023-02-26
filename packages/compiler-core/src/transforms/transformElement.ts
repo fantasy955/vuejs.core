@@ -70,10 +70,9 @@ import {
 // import, which should be used instead of a resolveDirective call.
 const directiveImportMap = new WeakMap<DirectiveNode, symbol>()
 
-// 返回的是一个函数 postTransformElement
-// postTransformElement函数回生成VNode
-// generate a JavaScript AST for this element's codegen
 export const transformElement: NodeTransform = (node, context) => {
+  // 这个代码要结束时才执行，为什么？
+  // 因为要等待所有子节点表达式执行完毕
   // perform the work on exit, after all child expressions have been
   // processed and merged.
   return function postTransformElement() {
