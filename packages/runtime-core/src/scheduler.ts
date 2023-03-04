@@ -76,6 +76,7 @@ function findInsertionIndex(id: number) {
   return start
 }
 
+// 添加刷新任务
 export function queueJob(job: SchedulerJob) {
   // the dedupe search uses the startIndex argument of Array.includes()
   // by default the search index includes the current job that is being run
@@ -101,6 +102,9 @@ export function queueJob(job: SchedulerJob) {
 
 function queueFlush() {
   if (!isFlushing && !isFlushPending) {
+    // 创建微任务，并将pending状态设置为true
+    // 意外着在这次浏览器渲染之前，不会再创建新的微任务
+    // 只会只需要往队列中添加任务即可
     isFlushPending = true
     currentFlushPromise = resolvedPromise.then(flushJobs)
   }
@@ -203,6 +207,8 @@ const comparator = (a: SchedulerJob, b: SchedulerJob): number => {
 }
 
 function flushJobs(seen?: CountMap) {
+  // 进行组件更新
+  // pending状态设置为false
   isFlushPending = false
   isFlushing = true
   if (__DEV__) {
