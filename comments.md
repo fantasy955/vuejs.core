@@ -4,9 +4,11 @@
 
 [toc]
 
+![render pipeline](assets/render-pipeline.03805016.png)
+
 ## vue文件到DOM元素经历的过程
 
-在Vue 3中，`.vue`文件最终会被编译成一个`render`函数，用于生成组件的虚拟节点（`vnode`），然后通过Vue 3内置的`createApp`函数创建一个Vue实例，将`vnode`挂载到该实例的根节点上，最终生成真实的DOM节点。
+在Vue 3中，`.vue`文件最终会被编译成一个`render`函数（`() => h(*****)`），每次执行渲染函数都会得到新的虚拟节点对象，用于生成组件的虚拟节点（`vnode`），然后通过Vue 3内置的`createApp`函数创建一个Vue实例，将`vnode`挂载到该实例的根节点上，最终生成真实的DOM节点。
 
 具体的编译和渲染过程可以简单概括为以下几个步骤：
 
@@ -147,6 +149,43 @@ Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循
 
 在Vue 3中，`setupRenderEffect`函数被广泛应用于组件的初始化、更新、卸载等过程中，它是实现Vue 3响应式机制的核心之一。由于Vue 3的响应式系统采用了Proxy代理对象的实现方式，相比Vue 2的响应式系统，它具有更高的性能和更灵活的特性，可以更好地支持动态组件、异步更新等场景。
 
+---
+
+## 官方文档
+
+- `h`函数，用于创建虚拟节点，VNode；
+
+- 渲染函数（`render`），返回`h`函数，返回一个创建虚拟VNode的函数；
+  使用选项式api时，`setup`函数可以返回一个渲染函数，`setup`函数创建了闭包，让渲染函数可以访问`setup`内的变量。
+
+  > 请确保返回的是一个函数而不是一个值！`setup()` 函数在每个组件中只会被调用一次，而返回的渲染函数将会被调用多次。
+
+- 元素类型标记
+
+- 在为这些元素生成渲染函数时，Vue 在 vnode 创建调用中直接编码了每个元素所需的更新类型：
+
+  ```js
+  createElementVNode("div", {
+    class: _normalizeClass({ active: _ctx.active })
+  }, null, 2 /* CLASS */)
+  ```
+
+  最后这个参数 `2` 就是一个[更新类型标记 (patch flag)](https://github.com/vuejs/core/blob/main/packages/shared/src/patchFlags.ts)。一个元素可以有多个更新类型标记，会被合并成一个数字。运行时渲染器也将会使用[位运算](https://en.wikipedia.org/wiki/Bitwise_operation)来检查这些标记，确定相应的更新操作：
+
+  ```js
+  if (vnode.patchFlag & PatchFlags.CLASS /* 2 */) {
+    // 更新节点的 CSS class
+  }
+  ```
+
+  位运算检查是非常快的。通过这样的更新类型标记，Vue 能够在更新带有动态绑定的元素时做最少的操作。
+  
+- 性能优化（带编译时信息的虚拟 DOM）：
+  静态提升和树结构打平。
+
 ## 参考资料
 
 - [Vue3源码解读（5）-transform与generate - 掘金 (juejin.cn)](https://juejin.cn/post/7060003448783110151)
+- [渲染机制 | Vue.js (vuejs.org)](https://cn.vuejs.org/guide/extras/rendering-mechanism.html#templates-vs-render-functions)
+- [渲染函数 & JSX | Vue.js (vuejs.org)](https://cn.vuejs.org/guide/extras/render-function.html#declaring-render-function)
+- [函数式组件 & JSX | Vue.js (vuejs.org)](https://cn.vuejs.org/guide/extras/render-function.html#functional-components)
