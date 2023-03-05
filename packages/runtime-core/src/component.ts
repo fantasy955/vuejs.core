@@ -498,6 +498,7 @@ export function createComponentInstance(
     subTree: null!, // will be set synchronously right after creation
     effect: null!,
     update: null!, // will be set synchronously right after creation
+    // 组件的副作用域，将渲染函数在副作用域下执行，进行依赖追踪
     scope: new EffectScope(true /* detached */),
     render: null,
     proxy: null,

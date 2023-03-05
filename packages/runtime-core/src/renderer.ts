@@ -1564,6 +1564,10 @@ function baseCreateRenderer(
       instance.scope // track it in component's effect scope
     ))
 
+    // 将组件的update函数用effect.run包裹运行
+    // 即在组件的副作用域对象内运行
+    // 这样可以追踪组件的依赖
+    // 副作用域对象 与 响应式变量的 get 方法配合，设置
     const update: SchedulerJob = (instance.update = () => effect.run())
     update.id = instance.uid
     // allowRecurse

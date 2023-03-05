@@ -11,7 +11,7 @@ export class EffectScope {
   /**
    * @internal
    */
-  effects: ReactiveEffect[] = []
+  effects: ReactiveEffect[] = []  // 副作用对象，保存有依赖的响应式对象信息
   /**
    * @internal
    */

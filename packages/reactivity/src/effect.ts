@@ -45,6 +45,7 @@ export type DebuggerEventExtraInfo = {
   oldTarget?: Map<any, any> | Set<any>
 }
 
+// 全局的activeEffect
 export let activeEffect: ReactiveEffect | undefined
 
 export const ITERATE_KEY = Symbol(__DEV__ ? 'iterate' : '')
@@ -248,6 +249,7 @@ export function trackEffects(
   }
 
   if (shouldTrack) {
+    // activeEffect 是当前的副作用对象
     dep.add(activeEffect!)
     activeEffect!.deps.push(dep)
     if (__DEV__ && activeEffect!.onTrack) {
