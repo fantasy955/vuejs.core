@@ -210,6 +210,8 @@ function createReactiveObject(
   if (targetType === TargetType.INVALID) {
     return target
   }
+
+  // baseHandlers 即包括了set方法、get方法、依赖收集、触发更新等
   const proxy = new Proxy(
     target,
     targetType === TargetType.COLLECTION ? collectionHandlers : baseHandlers
