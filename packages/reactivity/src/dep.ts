@@ -32,6 +32,7 @@ export const newTracked = (dep: Dep): boolean => (dep.n & trackOpBit) > 0
 export const initDepMarkers = ({ deps }: ReactiveEffect) => {
   if (deps.length) {
     for (let i = 0; i < deps.length; i++) {
+      // 给依赖添加观察者 （副作用函数，组件的渲染函数）
       deps[i].w |= trackOpBit // set was tracked
     }
   }

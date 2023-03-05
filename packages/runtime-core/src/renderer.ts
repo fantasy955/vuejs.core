@@ -1298,6 +1298,8 @@ function baseCreateRenderer(
     }
   }
 
+  // 为组件创建一个渲染副作用
+  // 渲染副作用是一种在组件状态发生变化时，自动重新渲染组件的机制。
   const setupRenderEffect: SetupRenderEffectFn = (
     instance,
     initialVNode,
@@ -1307,6 +1309,7 @@ function baseCreateRenderer(
     isSVG,
     optimized
   ) => {
+    // 用于组件更新的函数，获取组件新的props，attrs，slots
     const componentUpdateFn = () => {
       if (!instance.isMounted) {
         let vnodeHook: VNodeHook | null | undefined
@@ -1551,6 +1554,10 @@ function baseCreateRenderer(
     }
 
     // create reactive effect for rendering
+    // 返回一个ReactiveEffect对象
+    // ReactiveEffect对象上有一个EffectScope对象
+    // EffectScope对象上的run方法可以追踪依赖
+    // ReactiveEffect对象上的run方法
     const effect = (instance.effect = new ReactiveEffect(
       componentUpdateFn,
       () => queueJob(update),

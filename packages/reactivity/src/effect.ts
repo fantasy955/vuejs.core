@@ -52,6 +52,7 @@ export const MAP_KEY_ITERATE_KEY = Symbol(__DEV__ ? 'Map key iterate' : '')
 
 export class ReactiveEffect<T = any> {
   active = true
+  // 依赖
   deps: Dep[] = []
   parent: ReactiveEffect | undefined = undefined
 
@@ -85,6 +86,7 @@ export class ReactiveEffect<T = any> {
 
   run() {
     if (!this.active) {
+      // 如果没有激活，直接执行更新函数
       return this.fn()
     }
     let parent: ReactiveEffect | undefined = activeEffect
@@ -210,6 +212,7 @@ export function resetTracking() {
   shouldTrack = last === undefined ? true : last
 }
 
+// 依赖收集相关函数
 export function track(target: object, type: TrackOpTypes, key: unknown) {
   if (shouldTrack && activeEffect) {
     let depsMap = targetMap.get(target)

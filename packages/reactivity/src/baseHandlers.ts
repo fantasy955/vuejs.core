@@ -132,6 +132,7 @@ function createGetter(isReadonly = false, shallow = false) {
     }
 
     if (!isReadonly) {
+      // 依赖收集
       track(target, TrackOpTypes.GET, key)
     }
 

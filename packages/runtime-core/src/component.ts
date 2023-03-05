@@ -466,6 +466,7 @@ let uid = 0
  * 而ComponentInstance就是这个组件实例。
  * 每个ComponentInstance都具有一个完整的Vue实例，
  * 包含该组件的所有选项和数据，以及Vue的实例方法和生命周期钩子。
+ * 进行更新操作等都是组件实例，VNode是静态的描述
  */
 /**
  *
@@ -475,7 +476,7 @@ let uid = 0
  * @returns
  */
 export function createComponentInstance(
-  vnode: VNode,
+  vnode: VNode, // 虚拟节点，对组件的描述
   parent: ComponentInternalInstance | null,
   suspense: SuspenseBoundary | null
 ) {

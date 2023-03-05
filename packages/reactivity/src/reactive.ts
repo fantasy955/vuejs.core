@@ -87,6 +87,7 @@ export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRefSimple<T>
  * ```
  */
 export function reactive<T extends object>(target: T): UnwrapNestedRefs<T>
+// 创建响应式对象
 export function reactive(target: object) {
   // if trying to observe a readonly proxy, return the readonly version.
   if (isReadonly(target)) {
