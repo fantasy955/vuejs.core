@@ -16,6 +16,7 @@ import { ComputedRefImpl } from './computed'
 // which maintains a Set of subscribers, but we simply store them as
 // raw Sets to reduce memory overhead.
 type KeyToDepMap = Map<any, Dep>
+// 响应式数据 到 依赖这个响应式数据的Map，属性 --> Dep对象
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
 // The number of effects currently being tracked recursively.
@@ -54,6 +55,8 @@ export const MAP_KEY_ITERATE_KEY = Symbol(__DEV__ ? 'Map key iterate' : '')
 export class ReactiveEffect<T = any> {
   active = true
   // 依赖
+  // 观察者
+  // 如果fn是computed函数，则会有其他的副作用依赖this
   deps: Dep[] = []
   parent: ReactiveEffect | undefined = undefined
 
@@ -78,10 +81,14 @@ export class ReactiveEffect<T = any> {
   onTrigger?: (event: DebuggerEvent) => void
 
   constructor(
-    public fn: () => T,
+    public fn: () => T,  // 需要进行依赖追踪的函数  在run方法中运行，run方法返回fn函数的执行结果
     public scheduler: EffectScheduler | null = null,
     scope?: EffectScope
   ) {
+    // 如果存在scope对象（组件？）则在scope.effects数组中，添加this
+    // this 就是ReactiveEffect，响应式的副作用函数
+    // this.fn 是原始函数，可能带有副作用的函数
+    // 让这些副作用收到作用域的控制，例如停止
     recordEffectScope(this, scope)
   }
 
@@ -90,6 +97,7 @@ export class ReactiveEffect<T = any> {
       // 如果没有激活，直接执行更新函数
       return this.fn()
     }
+    // activeEffect是全局的
     let parent: ReactiveEffect | undefined = activeEffect
     let lastShouldTrack = shouldTrack
     while (parent) {
@@ -100,6 +108,7 @@ export class ReactiveEffect<T = any> {
     }
     try {
       this.parent = activeEffect
+      // 设置当前被激活的副作用为自身（自身上有一个fn属性，依赖变化时要执行fn）
       activeEffect = this
       shouldTrack = true
 
@@ -214,6 +223,9 @@ export function resetTracking() {
 }
 
 // 依赖收集相关函数
+// 在proxy的get函数中被调用
+// 关键：activeEffect是在ReactiveEffect对象调用run方法时设置的
+// 而ReactiveEffect对象是在effect函数中创建的
 export function track(target: object, type: TrackOpTypes, key: unknown) {
   if (shouldTrack && activeEffect) {
     let depsMap = targetMap.get(target)
@@ -265,6 +277,7 @@ export function trackEffects(
   }
 }
 
+// 在proxy对象的set方法中被调用
 export function trigger(
   target: object,
   type: TriggerOpTypes,

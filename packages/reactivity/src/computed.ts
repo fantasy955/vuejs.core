@@ -23,6 +23,10 @@ export interface WritableComputedOptions<T> {
   set: ComputedSetter<T>
 }
 
+
+// computed函数的具体实现，返回一个ComputedRefImpl 对象
+// 使用ReactiveEffect 调用函数
+// 使用_dirty 标记是否需要更新
 export class ComputedRefImpl<T> {
   public dep?: Dep = undefined
 
@@ -58,6 +62,7 @@ export class ComputedRefImpl<T> {
     trackRefValue(self)
     if (self._dirty || !self._cacheable) {
       self._dirty = false
+      // 通过ReactiveEffect 对象的run 方法进行依赖追踪
       self._value = self.effect.run()!
     }
     return self._value

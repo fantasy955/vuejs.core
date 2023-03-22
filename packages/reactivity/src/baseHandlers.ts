@@ -63,6 +63,7 @@ function createArrayInstrumentations() {
         track(arr, TrackOpTypes.GET, i + '')
       }
       // we run the method using the original args first (which may be reactive)
+      // 调用arr上的key方法，传入参数，得到结果
       const res = arr[key](...args)
       if (res === -1 || res === false) {
         // if that didn't work, run it again using raw values.

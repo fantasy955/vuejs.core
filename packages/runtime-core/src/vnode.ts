@@ -164,6 +164,7 @@ export interface VNode<
    */
   slotScopeIds: string[] | null
   children: VNodeNormalizedChildren
+  // VNode上有ComponentInternalInstance 属性
   component: ComponentInternalInstance | null
   dirs: DirectiveBinding[] | null
   transition: TransitionHooks<HostElement> | null

@@ -826,6 +826,7 @@ function baseCreateRenderer(
 
     const areChildrenSVG = isSVG && n2.type !== 'foreignObject'
     if (dynamicChildren) {
+      // Block 块是一个稳定结构，即不包括v-if v-for，可以进行逐个元素的对比
       patchBlockChildren(
         n1.dynamicChildren!,
         dynamicChildren,
@@ -960,6 +961,7 @@ function baseCreateRenderer(
       const container =
         // oldVNode may be an errored async setup() component inside Suspense
         // which will not have a mounted element
+        // 组件都有一个闭合标签包裹，或者是一个Fragment
         oldVNode.el &&
         // - In the case of a Fragment, we need to provide the actual parent
         // of the Fragment itself so it can move its children.
@@ -1289,6 +1291,7 @@ function baseCreateRenderer(
         // double updating the same child component in the same flush.
         invalidateJob(instance.update)
         // instance.update is the reactive effect.
+        // 重新执行副作用函数？instance是 ComponentInternalInstance 类型
         instance.update()
       }
     } else {

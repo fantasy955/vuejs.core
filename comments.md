@@ -33,9 +33,9 @@
 
 所有编译函数的编译结果（返回值）对象中都包含一个`ast`属性。
 
-在 Vue 3 中，虚拟语法树（Abstract Syntax Tree，AST）是 Vue 编译器的一个重要概念，用于描述模板代码的抽象语法结构。Vue 3 的编译器会先将模板代码解析成 AST，然后再将 AST 转换成可执行的渲染函数，最终用于生成真实的 DOM 节点。
+在 Vue 3 中，虚拟语法树（Abstract Syntax Tree，AST）是 Vue 编译器的一个重要概念，用于**描述模板代码的抽象语法结构**。Vue 3 的编译器会先将模板代码解析成 AST，然后再将 AST 转换成可执行的渲染函数，最终用于生成真实的 DOM 节点。
 
-Vue 3 的 AST 是一个基于 JSON 格式的对象，用于表示模板代码中的各种语法结构。一个简单的 Vue 3 模板代码的 AST 结构可能如下所示：
+Vue 3 的 AST 是一个基于 JSON 格式的**对象**，用于表示模板代码中的各种语法结构。一个简单的 Vue 3 模板代码的 AST 结构可能如下所示：
 
 ```json
 {
@@ -65,6 +65,27 @@ Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循
 
 - 函数：`compileTemplate` --->`doCompileTemplate` 
 
+### AST ---> VNode
+
+将 AST 转化为 `vnode` 的过程主要涉及以下几个函数：
+
+1. `baseCreateVNode`：创建 `vnode` 对象的函数，它接收多个参数，包括节点类型、节点属性、子节点等信息，并返回一个 `vnode` 对象。
+2. `createVNodeTransform`：用于生成 AST 转换器的函数，返回一个对象，其中包含 `transformElement` (`vuejs.core\packages\compiler-core\src\transforms\transformElement.ts`)、`transformSlotOutlet` 等方法，用于将 AST 节点转换成 `vnode` 对象。
+   在`baseCompile`中调用了`getBaseTransformPreset`函数，得到`nodeTransforms`**函数列表**，包含大量的transform函数。
+   之后调用了`transorm`函数，传入ast对象。
+3. `transform`：用于执行 AST 转换的函数，接收 AST 树和一组转换器作为参数，将 AST 树中的节点依次传入转换器进行转换，并返回转换后的结果。
+
+这些函数一起工作，可以将 AST 树转换为 `vnode` 对象，具体流程如下：
+
+1. 通过 `createVNodeTransform`函数生成 AST 转换器，包括 `transformElement`、`transformSlotOutlet` 等方法，用于将 AST 节点转换成 `vnode` 对象。
+2. 调用 `transform` 函数，将 AST 树和生成的转换器作为参数传入，开始执行 AST 转换。
+3. `transform` 函数遍历 AST 树中的每一个节点，并根据节点类型选择相应的转换器进行转换。
+4. `transformElement` 方法会将 AST 树中的普通元素节点转换成 `vnode` 对象，包括节点类型、节点属性、子节点等信息。对于子节点，会递归调用 `transform` 方法进行转换。
+5. `transformSlotOutlet` 方法用于转换插槽节点，将其转换为带有 `name` 和 `children` 属性的 `vnode` 对象。
+6. 最终，`transform` 函数返回转换后的 `vnode` 对象。
+
+总的来说，将 AST 转换为 `vnode` 的过程需要用到 `createVNodeTransform`、`transform` 和 `transformElement`、`transformSlotOutlet` 等函数，并通过遍历 AST 树，将 AST 节点转换为 `vnode` 对象。
+
 ## Vnode和ComponentInstance对象
 
 - `vnode`（Virtual DOM Node）：虚拟节点，是Vue内部用来**描述DOM节点的JavaScript对象**。每个vnode包含节点的标签名、属性、子节点等信息，它们可以通过渲染函数或者组件的render方法生成。在Vue的数据变化检测过程中，Vue会比对新旧vnode之间的差异，并根据差异更新DOM。因为vnode的创建和比对都在JavaScript中进行，所以相对于直接操作DOM，它们更加高效、灵活和安全。
@@ -91,6 +112,7 @@ Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循
 
 在渲染过程中，如果某些响应式数据发生了变化，就会触发副作用函数的重新执行，重新生成新的渲染节点，并将其与之前的渲染节点进行比较，最终将差异应用到DOM上，从而实现响应式更新。
 
+<<<<<<< HEAD
 在Vue 3中，`setupRenderEffect`函数被广泛应用于组件的初始化、更新、卸载等过程中，它是实现Vue 3响应式机制的核心之一。由于Vue 3的响应式系统采用了Proxy代理对象的实现方式，相比Vue 2的响应式系统，它具有更高的性能和更灵活的特性，可以更好地支持动态组件、异步更新等场景。
 
 ---
@@ -133,3 +155,6 @@ Vue 3 的 AST 还支持一些高级的语法结构，比如条件表达式、循
 - [渲染机制 | Vue.js (vuejs.org)](https://cn.vuejs.org/guide/extras/rendering-mechanism.html#templates-vs-render-functions)
 - [渲染函数 & JSX | Vue.js (vuejs.org)](https://cn.vuejs.org/guide/extras/render-function.html#declaring-render-function)
 - [函数式组件 & JSX | Vue.js (vuejs.org)](https://cn.vuejs.org/guide/extras/render-function.html#functional-components)
+=======
+在Vue 3中，`setupRenderEffect`函数被广泛应用于组件的初始化、更新、卸载等过程中，它是实现Vue 3响应式机制的核心之一。由于Vue 3的响应式系统采用了Proxy代理对象的实现方式，相比Vue 2的响应式系统，它具有更高的性能和更灵活的特性，可以更好地支持动态组件、异步更新等场景。
+>>>>>>> e828fde8... Revert "chore: transform过程分析"
