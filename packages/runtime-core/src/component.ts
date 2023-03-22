@@ -460,24 +460,24 @@ const emptyAppContext = createAppContext()
 
 let uid = 0
 
-<<<<<<< HEAD
-/**
- *
- * 在Vue中，每个组件都是通过构造函数VueComponent创建的实例，
- * 而ComponentInstance就是这个组件实例。
- * 每个ComponentInstance都具有一个完整的Vue实例，
- * 包含该组件的所有选项和数据，以及Vue的实例方法和生命周期钩子。
- * 进行更新操作等都是组件实例，VNode是静态的描述
- */
-/**
- *
- * @param vnode
- * @param parent
- * @param suspense
- * @returns
- */
-=======
->>>>>>> e884f02a... Revert "chore: 分析createComponentInstance函数"
+// <<<<<<< HEAD
+// /**
+//  *
+//  * 在Vue中，每个组件都是通过构造函数VueComponent创建的实例，
+//  * 而ComponentInstance就是这个组件实例。
+//  * 每个ComponentInstance都具有一个完整的Vue实例，
+//  * 包含该组件的所有选项和数据，以及Vue的实例方法和生命周期钩子。
+//  * 进行更新操作等都是组件实例，VNode是静态的描述
+//  */
+// /**
+//  *
+//  * @param vnode
+//  * @param parent
+//  * @param suspense
+//  * @returns
+//  */
+// =======
+// >>>>>>> e884f02a... Revert "chore: 分析createComponentInstance函数"
 export function createComponentInstance(
   vnode: VNode, // 虚拟节点，对组件的描述
   parent: ComponentInternalInstance | null,
